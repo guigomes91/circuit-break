@@ -1,0 +1,13 @@
+# Circuti break project
+
+Configuration
+
+spring.application.name=circuit-breaker
+
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.registerHealthIndicator=true
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.minimumNumberOfCalls=5
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.slidingWindowSize=5
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.failureRateThreshold=50
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.waitDurationInOpenState=10000
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.permittedNumberOfCallsInHalfOpenState=3
+resilience4j.circuitbreaker.instances.gomesBankCircuitBreaker.automaticTransitionFromOpenToHalfOpenEnabled=true
