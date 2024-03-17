@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @EnableScheduling
@@ -18,9 +18,9 @@ public class SchedulerService implements Scheduler {
     @Value("${scheduler.fixedRate}")
     private int SCHEDULER_TIME_IN_MS;
 
-    private int execuctions = 0;
+    private final AtomicInteger executions = new AtomicInteger(0);
 
-    private final AtomicBoolean schedulerAtivo = new AtomicBoolean(true);
+    private volatile boolean schedulerActive = true;
 
     @Autowired
     private ConsultaCepService cepService;
@@ -28,22 +28,20 @@ public class SchedulerService implements Scheduler {
     @Scheduled(fixedRateString = "${scheduler.fixedRate}")
     @Override
     public void getCepScheduler() {
-        if (!schedulerAtivo.get()) {
-            log.warn("Scheduler desativated");
+        if (!schedulerActive) {
+            log.warn("Scheduler desativated!");
             return;
         }
 
-        if (execuctions >= 5) {
-            if (schedulerAtivo.compareAndSet(true, false)) {
-                log.warn("Scheduler time exceeded");
-                return;
-            }
-        }
+        int currentExecucoes = executions.incrementAndGet();
 
         log.info("Executing scheduler at {} ms", SCHEDULER_TIME_IN_MS);
         var cep = cepService.consultarCep("13481040");
-        log.info("Step {} -> Response {}", execuctions, cep);
+        log.info("Step {} -> Response {}", currentExecucoes, cep);
 
-        execuctions++;
+        if (currentExecucoes >= 5) {
+            schedulerActive = false;
+            log.warn("Scheduler time exceeded");
+        }
     }
 }
