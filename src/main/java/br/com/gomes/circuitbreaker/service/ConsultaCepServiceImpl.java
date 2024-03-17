@@ -15,7 +15,7 @@ public class ConsultaCepServiceImpl implements ConsultaCepService {
     @Override
     @CircuitBreaker(name = "gomesBankCircuitBreaker", fallbackMethod = "fallbackMethod")
     public String consultarCep(String cep) {
-        String URL = "https://viacepe.com.br/ws/%s/json";
+        String URL = "https://viacep.com.br/ws/%s/json";
         var cepEntity = restTemplate.getForEntity(String.format(URL, cep), String.class);
         return cepEntity.getBody();
     }
